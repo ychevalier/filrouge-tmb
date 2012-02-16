@@ -14,7 +14,9 @@
 
 #define NBPIXELSMIN 10
 
-#define SEUILAPPROCHE 0.02
+#define SEUILAPPROCHE 0.05
+
+#define ARRONDI 100000.0
 
 using namespace std;
 
@@ -206,8 +208,8 @@ float Interface::GetX()
 		float res = *x;
 		
 		// Arrondi du Float
-		int tmp =(int)(res * 100.0);
-		res = (float)(tmp)/100.0;
+		int tmp =(int)(res * ARRONDI);
+		res = (float)(tmp)/ARRONDI;
 		
 		//cerr << "X : " << res << endl;
 		semop (sem, &liberer, 1); 
@@ -223,7 +225,7 @@ float Interface::GetX()
 	
 }
 
-float Interface::Gety() 
+float Interface::GetY() 
 {
 	if ( app == NULL ) 
 	{	
@@ -234,13 +236,13 @@ float Interface::Gety()
 		float res = *y;
 		
 		// Arrondi du Float
-		int tmp =(int)(res * 100.0);
-		res = (float)(tmp)/100.0;
+		int tmp =(int)(res * ARRONDI);
+		res = (float)(tmp)/ARRONDI;
 		
 		//cerr << "Y : " << res << endl;
 		semop (sem, &liberer, 1); 
 		// Inversion du sens...
-		return 1 - res;
+		return res;
 	}
 	else 
 	{
@@ -265,6 +267,10 @@ bool Interface::isMousePressed()
 		semop (semClick, &reserver, 1);
 		bool res = *isPressed;
 		semop (semClick, &liberer, 1); 
+		if(res == true)
+			cerr << "Préssé !!" << endl;
+		else
+			cerr << "=== Pas préssé !!" << endl;
 		return res;
 	}
 
@@ -463,12 +469,12 @@ void Interface::binarisation(IplImage* image, int *nbPixels, int *nbPixelsClick)
 		semop (semClick, &reserver, 1);
 		if ( ((*x-xClick)*(*x-xClick) + (*y-yClick)*(*y-yClick)) < SEUILAPPROCHE )
 		{
-			cerr << "### Pressed : " << ((*x-xClick)*(*x-xClick) + (*y-yClick)*(*y-yClick)) << endl;
+			//cerr << "### Pressed : " << ((*x-xClick)*(*x-xClick) + (*y-yClick)*(*y-yClick)) << endl;
 			*isPressed = true;
 		}
 		else
 		{
-			cerr << "### Not Pressed... : " << ((*x-xClick)*(*x-xClick) + (*y-yClick)*(*y-yClick)) << endl;
+			//cerr << "### Not Pressed... : " << ((*x-xClick)*(*x-xClick) + (*y-yClick)*(*y-yClick)) << endl;
 			*isPressed = false;
 		}
 		semop (semClick, &liberer, 1); 

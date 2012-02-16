@@ -17,6 +17,8 @@
 #define STEP_MIN 5
 #define STEP_MAX 100
 
+enum prochain { CLICK, TRACKING };
+
 // Get the color of the pixel where the mouse has clicked
 void getObjectColor(int event, int x, int y, int flags, void *param = NULL);
 
@@ -30,7 +32,7 @@ class Interface {
         ~Interface();
         
         float GetX();
-        float Gety();
+        float GetY();
         
         bool isMousePressed();
        
@@ -41,20 +43,31 @@ class Interface {
         void afficherFenetre();
         void supprimerFenetre(); 
         
-        inline IplImage* getImage() { return image; }
+        IplImage* getImage() { return image; }
         
         void setH(int unH) { h = unH; }
         void setS(int unS) { s = unS; }
         void setV(int unV) { v = unV; }
         
-        // Temporaire, fais des getters après...
+        void setHClick(int unH) { hClick = unH; }
+        void setSClick(int unS) { sClick = unS; }
+        void setVClick(int unV) { vClick = unV; }
+        
+        prochain getNext() { return toChoose; }
+        void setNext() 
+        { 
+			if(toChoose == CLICK) toChoose = TRACKING;
+			else toChoose = CLICK;
+		}
         
     private: 
 		
-		// Add a circle on the video that fellow your colored object
-		void addObjectToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels);
+		// Add to Circles, one for the tracking and one for the click. -- In Dev
+		void addObjectsToVideo(IplImage* image, CvPoint objectNextPos, int nbPixels, CvPoint clickNextPos, int nbPixelsClick);
+		
 		// Transform the image into a two colored image, one color for the color we want to track, another color for the others colors
-		CvPoint binarisation(IplImage* image, int *nbPixels);
+		// Modifie tout seul la position des ronds...
+		void binarisation(IplImage* image, int *nbPixels, int *nbPixelsClick);
 		
 		int max(int a, int b) { return (a) > (b) ? (a) : (b); }
 		int min(int a, int b) { return (a) < (b) ? (a) : (b); }  
@@ -68,8 +81,6 @@ class Interface {
 		// Position du point rouge.
 		CvPoint objectPos;
         sf::RenderWindow* app;
-        
-        bool isPressed;
         
         float *x;
 		float *y;
@@ -89,6 +100,25 @@ class Interface {
         // Pour plus de facilité, mais utilisé comme un bool
         int *affiche;
         int semAffiche;
+        
+        // Position du click et de son point.
+        CvPoint clickPos;
+        float xClick;
+        float yClick;
+        
+        // Variable partagé pour dire si on est cliqué.
+        bool *isPressed;
+        int sharedIdisPressed;
+        
+        // Couleur du click.
+        int hClick,sClick,vClick, toleranceClick;
+        
+        // Sémaphore pour isPressed.
+        int semClick;
+        
+        // Pour savoir qu'est ce qu'on choisi au prochain clic.
+        // Prend ses valeurs dans l'énumération PROCHAIN.
+        prochain toChoose;
 		
 };
 

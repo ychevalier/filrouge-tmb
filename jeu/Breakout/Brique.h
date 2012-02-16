@@ -1,5 +1,5 @@
-#ifndef BALLE_H
-#define BALLE_H
+#ifndef BRIQUE_H
+#define BRIQUE_H
 
 #include <SFML/Graphics.hpp>
 
@@ -7,26 +7,25 @@
 
 class BreakOut;
 
-class Balle : public GameSprite {
+class Brique : public GameSprite {
     public:
     	
     	// =================================== Constructors / Destructor
-        Balle(sf::Image* img, BreakOut* pGame=0);
-        ~Balle();
-        
-        // =================================== Redefined methods from GameSprite
-       	void Update();
+        Brique(sf::Image* img, int xinit, int yinit, BreakOut* pGame=0, int linitLife=1);
+        ~Brique();
        	
        	// =================================== Public methods
        	void Init();
+       	void SetLife(int laVie);
+       	void Hit(); //touché par la balle
+       	bool IsLiving();
     
     protected:
     
     	// =================================== Attributes
     	BreakOut* game;
-        sf::Vector2f direction;
-        
-        // =================================== Protected methods
+        int life;
+        int initLife;
 };
 
 #endif
